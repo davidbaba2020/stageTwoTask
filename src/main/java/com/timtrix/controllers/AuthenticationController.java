@@ -5,8 +5,10 @@ import com.timtrix.config.security.jwt.UserDetailsServiceImpl;
 import com.timtrix.dtos.AuthenticationDTO;
 import com.timtrix.dtos.AuthenticationResponse;
 import com.timtrix.dtos.UserDTO;
+import com.timtrix.entities.Organisation;
 import com.timtrix.entities.User;
 import com.timtrix.exceptions.InvalidCredentialsException;
+import com.timtrix.repositories.OrganisationRepository;
 import com.timtrix.repositories.UserRepository;
 import com.timtrix.service.auth.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,6 +26,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -36,6 +39,7 @@ public class AuthenticationController {
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthService authService;
     private final UserRepository userRepository;
+    private final OrganisationRepository organisationRepository;
 
     @PostMapping("/login")
     public Map<String, Object> logIn(@RequestBody AuthenticationDTO authenticationDTO, HttpServletResponse response) throws BadCredentialsException, DisabledException, UsernameNotFoundException, IOException {
@@ -104,5 +108,10 @@ public class AuthenticationController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/allOrganizations")
+    public List<Organisation> fetAllOrganizations() {
+        return organisationRepository.findAll();
     }
 }

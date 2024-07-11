@@ -1,25 +1,10 @@
 package com.timtrix.repositories;
 
 import com.timtrix.entities.Organisation;
+import com.timtrix.entities.User;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.UUID;
 
-public class OrganisationRepository {
-    private Map<String, Organisation> organisations = new ConcurrentHashMap<>();
-
-    public Organisation save(Organisation organisation) {
-        organisations.put(organisation.getOrgId(), organisation);
-        return organisation;
-    }
-
-    public Optional<Organisation> findById(String orgId) {
-        return Optional.ofNullable(organisations.get(orgId));
-    }
-
-    public void deleteById(String orgId) {
-        organisations.remove(orgId);
-    }
-
-    // Other CRUD methods as needed
+public interface OrganisationRepository extends JpaRepository<Organisation, UUID> {
 }

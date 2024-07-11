@@ -2,18 +2,18 @@ package com.timtrix.service.auth;
 
 import com.timtrix.config.security.jwt.JwtUtil;
 import com.timtrix.dtos.UserDTO;
+import com.timtrix.entities.Organisation;
 import com.timtrix.entities.User;
 import com.timtrix.exceptions.EmailAlreadyExistsException;
 import com.timtrix.exceptions.ResourceNotFoundException;
+import com.timtrix.repositories.OrganisationRepository;
 import com.timtrix.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -21,6 +21,7 @@ import java.util.UUID;
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
+    private final OrganisationRepository organisationRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
@@ -30,7 +31,7 @@ public class AuthServiceImpl implements AuthService {
         if(userFound.isPresent()) {
             throw new ResourceNotFoundException("User with email already exist");
         }
-        log.info("User exist,  {}", userFound);
+//        log.info("User exist,  {}", userFound);
         User newUser = User.builder()
                         .firstName(userDTO.getFirstName())
                         .lastName(userDTO.getLastName())
@@ -39,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
                         .phone(userDTO.getPhone())
                         .build();
         userRepository.save(newUser);
-
+        createDefaultOrg(newUser);
         log.info("New user,  {}", newUser);
         String accessToken = jwtUtil.generateToken(newUser.getEmail());
 
@@ -55,5 +56,28 @@ public class AuthServiceImpl implements AuthService {
                 "accessToken", accessToken,
                 "user", userData
         );
+    }
+
+
+
+    private void createDefaultOrg(User user) {
+        // Create organisation
+        String orgName = user.getFirstName() + "'s Organisation";
+        Organisation organisation = new Organisation(
+                orgName, user.getFirstName()
+                +" "+user.getLastName()+" "
+                +"Default organization"
+        );
+
+        // Add user to organisation
+        organisation.getUsers().add(user);
+//        organisationRepository.save(organisation);
+
+        // Add organisation to user
+        Set<Organisation> userOrganizations = new HashSet<>();
+        userOrganizations.add(organisation);
+        organisationRepository.save(organisation);
+
+
     }
 }
