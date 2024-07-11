@@ -2,15 +2,15 @@ package com.timtrix.repositories;
 
 import com.timtrix.entities.User;
 import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Repository
+
+@Service
 public class UserRepository  {
-//    User findByEmail(String email);
-//    Optional<User> findByEmail(String email);
 private Map<String, User> users = new ConcurrentHashMap<>();
 
     public User save(User user) {
