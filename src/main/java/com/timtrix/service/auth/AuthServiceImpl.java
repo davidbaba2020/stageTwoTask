@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -25,27 +26,30 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public Map<String, Object> createUser(UserDTO userDTO) {
-        Optional<User> userFound = userRepository.findByEmail(userDTO.getEmail());
-        if(userFound.isPresent()){
+        User userFound = userRepository.findByEmail(userDTO.getEmail());
+        log.info("User exist,  {}", userFound);
+        if(userFound!=null){
             throw new EmailAlreadyExistsException("User with email already exist");
         }
         User newUser = User.builder()
+                        .id(UUID.randomUUID().toString())
                         .firstName(userDTO.getFirstName())
                         .lastName(userDTO.getLastName())
                         .email(userDTO.getEmail())
                         .password(passwordEncoder.encode(userDTO.getPassword()))
                         .phone(userDTO.getPhone())
                         .build();
-        User savedUser = userRepository.save(newUser);
+        userRepository.save(newUser);
 
-        String accessToken = jwtUtil.generateToken(savedUser.getEmail());
+        log.info("New user,  {}", newUser);
+        String accessToken = jwtUtil.generateToken(newUser.getEmail());
 
         Map<String, Object> userData = Map.of(
-                "userId", savedUser.getId(),
-                "firstName", savedUser.getFirstName(),
-                "lastName", savedUser.getLastName(),
-                "email", savedUser.getEmail(),
-                "phone", savedUser.getPhone()
+                "userId", newUser.getId(),
+                "firstName", newUser.getFirstName(),
+                "lastName", newUser.getLastName(),
+                "email", newUser.getEmail(),
+                "phone", newUser.getPhone()
         );
 
         return Map.of(
