@@ -9,5 +9,5 @@ RUN mvn clean package
 FROM openjdk:17-jdk-slim
 WORKDIR /app
 COPY --from=build /app/target/stageTwoTask.jar ./stageTwoTask.jar
-EXPOSE 8085
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "stageTwoTask.jar"]
