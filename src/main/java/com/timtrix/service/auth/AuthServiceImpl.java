@@ -26,13 +26,12 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public Map<String, Object> createUser(UserDTO userDTO) {
-        User userFound = userRepository.findByEmail(userDTO.getEmail());
-        log.info("User exist,  {}", userFound);
-        if(userFound!=null){
-            throw new EmailAlreadyExistsException("User with email already exist");
+        Optional<User> userFound = userRepository.findByEmail(userDTO.getEmail());
+        if(userFound.isPresent()) {
+            throw new ResourceNotFoundException("User with email already exist");
         }
+        log.info("User exist,  {}", userFound);
         User newUser = User.builder()
-                        .id(UUID.randomUUID().toString())
                         .firstName(userDTO.getFirstName())
                         .lastName(userDTO.getLastName())
                         .email(userDTO.getEmail())

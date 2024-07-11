@@ -50,7 +50,7 @@ public class AuthenticationController {
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationDTO.getEmail());
         final String jwt = jwtUtil.generateToken(userDetails.getUsername());
-        User user = userRepository.findByEmail(userDetails.getUsername());
+        User user = userRepository.findByEmail(userDetails.getUsername()).get();
         log.info("The user details, {}", user);
         Map<String, Object> userData = Map.of(
                 "userId", user.getId(),
